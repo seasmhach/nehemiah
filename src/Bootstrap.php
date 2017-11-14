@@ -30,5 +30,9 @@ namespace Seasmhach\Nehemiah;
  * Bootstrapping the framework
  */
 class Bootstrap {
+	public function __construct() {}
 
+	public function test() {
+		echo 'Test';
+	}
 }
