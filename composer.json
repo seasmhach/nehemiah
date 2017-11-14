@@ -1,0 +1,21 @@
+{
+	"name": "seasmhach/nehemiah",
+	"description": "Small set of tools providing a basic framework",
+	"keywords": ["php","framework"],
+	"homepage": "https://github.com/seasmhach/nehemiah",
+	"license": "MIT",
+	"repositories": [
+		{
+			"type": "git",
+			"url": "https://hithub.com/seasmhach/nehemiah"
+		}
+	]
+	"require": {
+		"php": "^7.0"
+	},
+	"autoload": {
+		"psr-4" {
+			"Seasmhach\\Nehemiah\\": ""
+		}
+	}
+}
