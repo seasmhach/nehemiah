@@ -1,10 +1,18 @@
 {
 	"name": "seasmhach/nehemiah",
+	"type": "library",
 	"description": "Small set of tools providing a basic framework",
 	"keywords": ["php","framework"],
 	"homepage": "https://github.com/seasmhach/nehemiah",
 	"version": "1.0.0-dev",
 	"license": "MIT",
+	"authors": [
+		{
+			"name": "Seasmhach",
+			"email": "nehemiah@dovemail.eu",
+			"role": "Developer"
+		}
+	],
 	"require": {
 		"php": ">=7.0",
 		"altorouter/altorouter": ">=1.2"
