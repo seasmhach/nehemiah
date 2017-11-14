@@ -15,7 +15,7 @@
 	},
 	"autoload": {
 		"psr-4" {
-			"Seasmhach\\Nehemiah\\": ""
+			"Seasmhach\\Nehemiah\\": "src"
 		}
 	}
 }
