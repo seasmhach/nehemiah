@@ -9,7 +9,7 @@
 			"type": "git",
 			"url": "https://hithub.com/seasmhach/nehemiah"
 		}
-	]
+	],
 	"require": {
 		"php": ">=7.0"
 	},
