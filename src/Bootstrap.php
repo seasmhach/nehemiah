@@ -30,9 +30,16 @@ namespace Seasmhach\Nehemiah;
  * Bootstrapping the framework
  */
 class Bootstrap {
-	public function __construct() {}
-
-	public function test() {
-		echo 'Test';
+	/**
+	 * Set the projects root and url.
+	 *
+	 * @param string $project_root Absolute path to project root
+	 * @param string $project_url  Unique Resource Locator to this project
+	 */
+	public function __construct(string $project_root, string $project_url) {
+		define('N_PATH', $project_root);
+		define('N_URL', $project_url);
 	}
+
+	
 }
