@@ -25,11 +25,20 @@
  */
 
 namespace Seasmhach\Nehemiah;
+use AltoRouter;
+use Exception;
+use DomainException;
+use OutOfBoundsException;
 
 /**
  * Bootstrapping the framework
  */
 class Bootstrap {
+	/**
+	 * @var array Allowed landing domains (key) and their default route (value)
+	 */
+	private $landing_domains = [];
+
 	/**
 	 * Set the projects root and url.
 	 *
@@ -41,5 +50,64 @@ class Bootstrap {
 		define('N_URL', $project_url);
 	}
 
-	
+	/**
+	 * Specify a list of Landing domains and their default routes.
+	 * Look into the AltoRouter documentation:
+	 *
+	 * @link http://altorouter.com/ AltoRouter documentation
+	 * @example $landing_domains[
+	 * 	'https://google.com' => '/search-engine',
+	 * 	'my.website.com' => /frontpage
+	 * ]
+	 *
+	 * @param array $landing_domains [description]
+	 */
+	public function set_landing_domains(array $landing_domains) {
+		$this->landing_domains = $landing_domains;
+	}
+
+	/**
+	 * Launch bootstrapper.
+	 *
+	 * @param  AltoRouter $router                     AltoRouter object
+	 * @param  array $permission_denied_fallback Class namespace and method to call in case permission to the route is denied
+	 * @return void
+	 */
+	public function launch(AltoRouter $router, array $permission_denied_fallback) {
+		try {
+			if (rtrim(N_URL . $_SERVER['REQUEST_URI'], '/') === N_URL) {
+				$match = $router->match($this->landing_domains[N_URL]);
+			} else {
+				$match = $router->match();
+			}
+
+			if (!empty($match)) {
+				list($namespace, $method) = $match['target'];
+
+				if (!class_exists($namespace)) {
+					throw new DomainException("Controller doesn't exist: " . $class);
+				}
+
+				$controller = new $namespace();
+
+				if (!is_callable([$controller, $method])) {
+					throw new DomainException("Method '$method' doesn't  exist in contoller: " . $class);
+				} elseif (!is_callable([$controller, 'access_to'])) {
+					throw new DomainException("Required method 'access_to' missing in class: " . $class);
+				} elseif (true !== call_user_func([$controller, 'access_to'], $method)) {
+					list($namespace, $method) = $permission_denied_fallback;
+
+					$controller = new $namespace;
+
+					call_user_func_array([$controller, $method], []);
+				}
+			} else {
+				throw new OutOfBoundsException("The current request doesn't match any route");
+			}
+		} catch (Exception $exception) {
+			echo $exception->getMessage();
+
+			print_r($exception->getTrace());
+		}
+	}
 }
