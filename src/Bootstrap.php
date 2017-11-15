@@ -61,6 +61,7 @@ class Bootstrap {
 	 * ]
 	 *
 	 * @param array $landing_domains [description]
+	 * @return void
 	 */
 	public function set_landing_domains(array $landing_domains) {
 		$this->landing_domains = $landing_domains;
@@ -69,8 +70,8 @@ class Bootstrap {
 	/**
 	 * Launch bootstrapper.
 	 *
-	 * @param  AltoRouter $router                     AltoRouter object
-	 * @param  array $permission_denied_fallback Class namespace and method to call in case permission to the route is denied
+	 * @param  AltoRouter $router                 AltoRouter object
+	 * @param  array $permission_denied_fallback  Class namespace and method to call in case permission to the route is denied
 	 * @return void
 	 */
 	public function launch(AltoRouter $router, array $permission_denied_fallback) {
