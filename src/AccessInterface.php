@@ -25,51 +25,20 @@
  */
 
 namespace Seasmhach\Nehemiah;
-use AltoRouter;
-use OutOfBoundsException;
-use Exception;
-use Route\DomainBasedRoutes;
 
 /**
- * Bootstrapping the framework
+ * Should be implemented in all Controllers. It's purpose it to make sure that
+ * access to a specific method can met denied or granted.
  *
  * @author Seasmhach <nehemiah@dovemail.eu>
  * @version 1.0.0 Initial version
  */
-class Bootstrap {
-
-
+interface AccessInterface {
 	/**
-	 * Set the projects root and url.
+	 * Inquire about access to a controllers' method.
 	 *
-	 * @param string $project_root Absolute path to project root
+	 * @param  string $method Method that access is requested for
+	 * @return bool           Allow or deny access
 	 */
-	public function __construct(string $project_root) {
-		define('NEHEMIAH_PATH', $project_root);
-		define('NEHEMIAH_URL', (isset($_SERVER['HTTPS']) ? "https" : "http") . '://' . $_SERVER['HTTP_HOST']);
-	}
-
-	/**
-	 * Launch bootstrapper.
-	 *
-	 * @return void
-	 */
-	public function launch() {
-		try {
-			print_r(DomainBasedRoutes::routes); die;
-
-			$router = new AltoRouter();
-			$router->addRoutes(DomainBasedRoutes::routes[$_SERVER['HTTP_HOST']]);
-
-			if (!$router->match()) {
-				header("HTTP/1.0 404 Not Found");
-
-				throw new OutOfBoundsException("404 Page not found");
-			} else {
-
-			}
-		} catch (Exception $exception) {
-			require_once NEHEMIAH_PATH . '/vendor/seasmhach/nehemiah/exception/exception.php';
-		}
-	}
+	public function access_to(string $method) :bool;
 }

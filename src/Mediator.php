@@ -27,9 +27,13 @@
 namespace Seasmhach\Nehemiah;
 
 /**
- * Simple  trait based Observer pattern implementation.
+ * Simple trait based observer pattern implementation.
+ *
+ * @author Seasmhach <nehemiah@dovemail.eu>
+ * @version 1.0.0 Initial version.
  */
 trait Mediator {
+	/** @var array List of listeners */
 	private static $listeners = [];
 
 	/**
