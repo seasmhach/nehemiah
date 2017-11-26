@@ -22,7 +22,7 @@
 	"autoload": {
 		"psr-4": {
 			"Seasmhach\\Nehemiah\\": "src",
-			"Seasmhach\\Nehemiah\\View": "view"
+			"Seasmhach\\Nehemiah\\View\\": "view"
 		}
 	}
 }
