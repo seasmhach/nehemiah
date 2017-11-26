@@ -1,9 +1,9 @@
 <?php
 
-/*
+/* 
  * The MIT License
  *
- * Copyright 2017 Seasmhach <nehemiah@dovemail.eu>.
+ * Copyright 2017 Tribal Trading <info@tribaltrading.eu>.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,21 +24,40 @@
  * THE SOFTWARE.
  */
 
-namespace Seasmhach\Nehemiah;
+namespace View;
 
-/**
- * Should be implemented in all Controllers. It's purpose it to make sure that
- * access to a specific method can met denied or granted.
- *
- * @author Seasmhach <nehemiah@dovemail.eu>
- * @version 1.0.0 Initial version
- */
-interface AccessInterface {
-	/**
-	 * Inquire about access to a controllers' method.
-	 *
-	 * @param  string $method Method that access is requested for
-	 * @return bool           Allow or deny access
-	 */
-	public function access_to(string $method) :bool;
+class Json {
+	private $data = [];
+	
+	public static function factory(array $variables = []) {
+		return new self($variables);
+	}
+	
+	public function __construct(array $data = []) {
+		$this->data = $data;
+	}
+
+	public function __set(string $name, $value) {
+		$this->data[$name] = $value;
+	}
+
+	public function __get(string $name) {
+		return $this->data[$name] ?? null;
+	}
+
+	public function stream(bool $success) {
+		header('Content-Type: application/json');
+		header("Expires: on, 01 Jan 1970 00:00:00 GMT");
+		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+		header("Cache-Control: no-store, no-cache, must-revalidate");
+		header("Cache-Control: post-check=0, pre-check=0", false);
+		header("Pragma: no-cache");
+		
+		$response = json_encode([
+			'success' => $success,
+			'data' => $this->data
+		]);
+
+		die($response);
+	}
 }

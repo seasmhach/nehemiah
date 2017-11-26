@@ -32,7 +32,10 @@ namespace Seasmhach\Nehemiah;
  * @author Seasmhach <nehemiah@dovemail.eu>
  * @version 1.0.0 Initial version.
  */
-abstract class Controller {
+abstract class Base {
+	protected $method_access = [];
+	protected $properties = [];
+
 	/**
 	 * Initialize the public or protected properties of your child controller With
 	 * HTTP request variables.
@@ -101,7 +104,7 @@ abstract class Controller {
 	}
 
 	/**
-	 * Access to controller methods is denied by default. The bootstrapper expects
+	 * Access to controller actions is denied by default. The bootstrapper expects
 	 * all controllers to have an 'access_to' method implementation. This is the
 	 * default one.
 	 *
@@ -113,18 +116,17 @@ abstract class Controller {
 	 *    equals one of its values.
 	 *
 	 * This, of course is not a way to prevent public methods from being callable.
-	 * It provides guidelines for your public class properties. Guidelines that
-	 * the bootstrapper will honour.
+	 * It provides guidelines for your public class methods. Guidelines that the
+	 * bootstrapper will honour.
 	 *
-	 * If this method returns false, not even the controllers constructor will
-	 * be called.
+	 * Keep in mind: The controller's constructor is ALWAYS called!!
 	 *
 	 * @param  string $method       Controller action to get access to.
 	 * @param  string $access_level The current sessions access level
 	 * @return bool                 Tells if access should be granted or not.
 	 */
-	public static function access_to(string $method, string $access_level) {
-		$permission = $self::method_access[$method] ?? false;
+	public function access_to(string $method, string $access_level = '') {
+		$permission = $this->method_access[$method] ?? false;
 
 		if (true === $permission || $access_level === 'admin') {
 			return true;
@@ -135,5 +137,14 @@ abstract class Controller {
 		}
 
 		return false;
+	}
+
+	/**
+	 *
+	 *
+	 * @return [type] [description]
+	 */
+	public function get() {
+
 	}
 }

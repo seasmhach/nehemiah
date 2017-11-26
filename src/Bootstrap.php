@@ -27,8 +27,10 @@
 namespace Seasmhach\Nehemiah;
 use AltoRouter;
 use OutOfBoundsException;
+use DomainException;
 use Exception;
 use Route\DomainBasedRoutes;
+use Config\Paths;
 
 /**
  * Bootstrapping the framework
@@ -37,8 +39,6 @@ use Route\DomainBasedRoutes;
  * @version 1.0.0 Initial version
  */
 class Bootstrap {
-
-
 	/**
 	 * Set the projects root and url.
 	 *
@@ -54,22 +54,66 @@ class Bootstrap {
 	 *
 	 * @return void
 	 */
-	public function launch() {
+	public function launch(string $route = null) {
 		try {
-			print_r(DomainBasedRoutes::routes); die;
+			if (!isset(DomainBasedRoutes::routes[$_SERVER['HTTP_HOST']])) {
+				throw new OutOfBoundsException("There are no routes defined for domain: '" . $_SERVER['HTTP_HOST'] . "'.");
+			}
 
 			$router = new AltoRouter();
 			$router->addRoutes(DomainBasedRoutes::routes[$_SERVER['HTTP_HOST']]);
 
-			if (!$router->match()) {
+			if (!$match = $router->match($route)) {
 				header("HTTP/1.0 404 Not Found");
 
 				throw new OutOfBoundsException("404 Page not found");
 			} else {
+				list($controller, $action) = $match['target'];
 
+				if (!class_exists($controller) || !($instance = new $controller)) {
+					throw new DomainException("Controller doesn't exist: " . $class);
+				} elseif (!$instance->access_to($action)) {
+					if (is_null($route)) {
+						$this->launch(DomainBasedRoutes::routes[$_SERVER['HTTP_HOST'] . '_access_denied']);
+					} else {
+						die('ladieda');
+					}
+				} else {
+					$this->invoke_plugins();
+					$instance->$action();
+				}
 			}
 		} catch (Exception $exception) {
 			require_once NEHEMIAH_PATH . '/vendor/seasmhach/nehemiah/exception/exception.php';
+		}
+	}
+
+	/**
+	 * Invoking plugins.
+	 *
+	 * @return void
+	 */
+	private function invoke_plugins() {
+		/**
+		 * Invoke project plugins
+		 */
+		foreach (glob(Paths::PROJECTS . '/*', GLOB_ONLYDIR) as $project) {
+			$plugin_namespace = 'Projects\\' . basename($project) . '\\Plugin';
+
+			if (class_exists($plugin_namespace)) {
+				new $plugin_namespace;
+			}
+		}
+
+		/**
+		 * Invoke template pluginss
+		 */
+		foreach (glob(Paths::TEMPLATES . '/*', GLOB_ONLYDIR) as $template) {
+			$plugin_namespace = 'Templates\\' . basename($template) . '\\Plugin';
+
+			if (class_exists($plugin_namespace)) {
+				new $plugin_namespace;
+			}
 		}
 	}
 }
