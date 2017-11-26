@@ -16,7 +16,7 @@
 	"require": {
 		"php": ">=7.0",
 		"altorouter/altorouter": ">=1.2",
-		"dompdf/dompdf": ">=0.8",
+		"dompdf/dompdf": ">=0.8"
 	},
 	"autoload": {
 		"psr-4": {
