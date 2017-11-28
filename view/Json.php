@@ -1,6 +1,6 @@
 <?php
 
-/* 
+/*
  * The MIT License
  *
  * Copyright 2017 Tribal Trading <info@tribaltrading.eu>.
@@ -24,15 +24,15 @@
  * THE SOFTWARE.
  */
 
-namespace View;
+namespace Seasmhach\Nehemiah\View;
 
 class Json {
 	private $data = [];
-	
+
 	public static function factory(array $variables = []) {
 		return new self($variables);
 	}
-	
+
 	public function __construct(array $data = []) {
 		$this->data = $data;
 	}
@@ -52,7 +52,7 @@ class Json {
 		header("Cache-Control: no-store, no-cache, must-revalidate");
 		header("Cache-Control: post-check=0, pre-check=0", false);
 		header("Pragma: no-cache");
-		
+
 		$response = json_encode([
 			'success' => $success,
 			'data' => $this->data

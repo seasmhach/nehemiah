@@ -77,7 +77,7 @@ class DataObject {
 		}
 
 		if (!self::$databases[$database_name]['pdo_instance'] instanceof PDO) {
-			$databases[$database_name]['pdo_instance'] = new PDO($databases[$database_name]['dsn'], $databases[$database_name]['username'], $databases[$database_name]['password'], $databases[$database_name]['pdo_options']);
+			self::$databases[$database_name]['pdo_instance'] = new PDO(self::$databases[$database_name]['dsn'], self::$databases[$database_name]['username'], self::$databases[$database_name]['password'], self::$databases[$database_name]['pdo_options']);
 		}
 
 		return self::$databases[$database_name]['pdo_instance'];

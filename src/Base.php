@@ -33,75 +33,12 @@ namespace Seasmhach\Nehemiah;
  * @version 1.0.0 Initial version.
  */
 abstract class Base {
-	protected $method_access = [];
-	protected $properties = [];
-
 	/**
-	 * Initialize the public or protected properties of your child controller With
-	 * HTTP request variables.
+	 * See ::access_to
 	 *
-	 * The type of the request parameter will be casted to that of which the
-	 * property is currently initialized. It therefor makes sense to give your
-	 * properties sensible default values.
-	 *
-	 * This method works for $_POST, $_GET, $_COOKIE and $_FILES. Files that failed
-	 * uploading  are ignored.
-	 *
-	 * If you define a property '$accept', it will de initialized with the allowed
-	 * response headers.
-	 *
-	 * @return void
+	 * @var array
 	 */
-	protected function properties_from_request() {
-		/**
-		 * Getting the HTTP request variables.
-		 *
-		 * @see http://php.net/manual/en/reserved.variables.request.php
-		 */
-		foreach ($_REQUEST as $property => &$raw_value) {
-			if (property_exists($this, $property)) {
-				settype($raw_value, gettype($this->$property));
-
-				$this->$property = $raw_value;
-			}
-		}
-
-		/**
-		 * Support for single an multi file uploads.
-		 */
-		foreach ($_FILES as $property => $files) {
-			if (property_exists($this, $property)) {
-				if (is_array($files['error'])) {
-					foreach ($files['error'] as $index => $error_code) {
-						if ($error_code === UPLOAD_ERR_OK) {
-							$this->$property[] = array(
-								'name' => $files['name'][$index],
-								'mime' => $files['type'][$index],
-								'size' => $files['size'][$index],
-								'location' => $files['tmp_name'][$index]
-							);
-						}
-					}
-				} elseif ($files['error'] === UPLOAD_ERR_OK) {
-					$this->$property = array(
-						'name' => $files['name'],
-						'mime' => $files['type'],
-						'size' => $files['size'],
-						'location' => $files['tmp_name']
-					);
-				}
-			}
-		}
-
-		/**
-		 * Getting the accepted response headers.
-		 */
-		if (property_exists($this, 'accept') && is_string($accept = filter_input(INPUT_SERVER, 'HTTP_ACCEPT'))) {
-			list($types) = explode(';', $accept);
-
-			$this->accept = array_map('trim', explode(',', $types));
-		}
-	}
+	protected $method_access = [];
 
 	/**
 	 * Access to controller actions is denied by default. The bootstrapper expects
@@ -125,7 +62,7 @@ abstract class Base {
 	 * @param  string $access_level The current sessions access level
 	 * @return bool                 Tells if access should be granted or not.
 	 */
-	public function access_to(string $method, string $access_level = '') {
+	public function access_to(string $method, string $access_level) {
 		$permission = $this->method_access[$method] ?? false;
 
 		if (true === $permission || $access_level === 'admin') {
@@ -137,14 +74,5 @@ abstract class Base {
 		}
 
 		return false;
-	}
-
-	/**
-	 *
-	 *
-	 * @return [type] [description]
-	 */
-	public function get() {
-
 	}
 }

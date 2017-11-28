@@ -25,12 +25,16 @@
  */
 
 namespace Seasmhach\Nehemiah;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Response;
+use Seasmhach\Nehemiah\DataObject;
 use AltoRouter;
 use OutOfBoundsException;
 use DomainException;
 use Exception;
-use Route\DomainBasedRoutes;
+use Config\DomainBasedRoutes;
 use Config\Paths;
+use Config\DB;
 
 /**
  * Bootstrapping the framework
@@ -56,6 +60,9 @@ class Bootstrap {
 	 */
 	public function launch(string $route = null) {
 		try {
+			$session = new Session();
+			$account = $session->get('nehemiah_user');
+
 			if (!isset(DomainBasedRoutes::routes[$_SERVER['HTTP_HOST']])) {
 				throw new OutOfBoundsException("There are no routes defined for domain: '" . $_SERVER['HTTP_HOST'] . "'.");
 			}
@@ -71,21 +78,39 @@ class Bootstrap {
 				list($controller, $action) = $match['target'];
 
 				if (!class_exists($controller) || !($instance = new $controller)) {
-					throw new DomainException("Controller doesn't exist: " . $class);
-				} elseif (!$instance->access_to($action)) {
+					throw new DomainException("Controller doesn't exist: " . $controller);
+				} elseif (!$instance->access_to($action, $account['type'] ?? '')) {
 					if (is_null($route)) {
 						$this->launch(DomainBasedRoutes::routes[$_SERVER['HTTP_HOST'] . '_access_denied']);
 					} else {
-						die('ladieda');
+						header("HTTP/1.0 403 Forbidden");
+
+						throw new OutOfBoundsException("403 Forbidden");
 					}
+				} elseif (!is_callable([$controller, $action])) {
+					throw new DomainException("Action '$action' is not defined in controller: " . $controller);
 				} else {
+					$this->register_mysql_connection();
 					$this->invoke_plugins();
-					$instance->$action();
+
+					$response = call_user_func_array([$instance, $action], $match['params'] ?? []);
+
+					if (!$response) {
+						throw new OutOfBoundsException("Action '$action' in controller '$controller' is returning void.");
+					} elseif ($response instanceof Response) {
+						$response->send();
+					} else {
+						echo $response;
+					}
 				}
 			}
 		} catch (Exception $exception) {
 			require_once NEHEMIAH_PATH . '/vendor/seasmhach/nehemiah/exception/exception.php';
 		}
+	}
+
+	private function register_mysql_connection() {
+		DataObject::register(DB::DRIVER, DB::DB, DB::HOST, DB::USER, DB::PASS, DB::PDO_OPTIONS);
 	}
 
 	/**
